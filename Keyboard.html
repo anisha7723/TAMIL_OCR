@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil-English Keyboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #keyboard { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .row { display: flex; }
+        .key { 
+            width: 40px; height: 40px; margin: 2px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #ccc; background: #f9f9f9; cursor: pointer;
+            border-radius: 5px; font-size: 18px;
+        }
+        .key.space { width: 150px; }
+        .key.large { width: 60px; }
+    </style>
+</head>
+<body>
+    <h2>Tamil-English Keyboard</h2>
+    <textarea id="textArea" rows="3" cols="50"></textarea>
+    <br>
+    <div id="keyboard">
+        <div class="row" id="firstRow"></div>
+        <div class="row" id="secondRow"></div>
+        <div class="row" id="thirdRow"></div>
+        <div class="row">
+            <div class="key large" onclick="toggleLang()">🌐</div>
+            <div class="key large" onclick="toggleCase()">⬆️</div>
+            <div class="key space" onclick="insertText(' ')">Space</div>
+            <div class="key large" onclick="deleteText()">⌫</div>
+        </div>
+    </div>
+    <script>
+        const englishLettersLower = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        const englishLettersUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        let isUpperCase = false;
+        let isTamil = false;
+        let lastMei = '';
+
+        const tamilUyirEluthu = ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ', 'ஃ'];
+        const tamilMeiEluthu = ['க', 'ங', 'ச', 'ஞ', 'ட', 'ண', 'த', 'ந', 'ப', 'ம', 'ய', 'ர', 'ல', 'வ', 'ழ', 'ள', 'ற', 'ன'];
+        
+        const uyirMeiCombinations = {};
+        tamilMeiEluthu.forEach(mei => {
+            uyirMeiCombinations[mei] = {
+                'அ': mei, 'ஆ': mei + 'ா', 'இ': mei + 'ி', 'ஈ': mei + 'ீ',
+                'உ': mei + 'ு', 'ஊ': mei + 'ூ', 'எ': mei + 'ெ', 'ஏ': mei + 'ே',
+                'ஐ': mei + 'ை', 'ஒ': mei + 'ொ', 'ஓ': mei + 'ோ', 'ஔ': mei + 'ௌ', 'ஃ': mei + '்'
+            };
+        });
+
+        function generateKeyboard() {
+            document.getElementById("firstRow").innerHTML = '';
+            document.getElementById("secondRow").innerHTML = '';
+            document.getElementById("thirdRow").innerHTML = '';
+            let letters = isTamil ? tamilUyirEluthu.concat(tamilMeiEluthu) : (isUpperCase ? englishLettersUpper : englishLettersLower);
+            
+            letters.forEach((letter, index) => {
+                let rowId = index < 10 ? "firstRow" : index < 19 ? "secondRow" : "thirdRow";
+                createKey(letter, rowId);
+            });
+        }
+
+        function createKey(char, row) {
+            let key = document.createElement("div");
+            key.className = "key";
+            key.textContent = char;
+            key.onclick = () => handleKeyPress(char);
+            document.getElementById(row).appendChild(key);
+        }
+
+        function handleKeyPress(char) {
+            let textArea = document.getElementById("textArea");
+            
+            if (isTamil) {
+                if (tamilMeiEluthu.includes(char)) {
+                    lastMei = char;
+                    insertText(char);
+                } else if (lastMei && uyirMeiCombinations[lastMei][char]) {
+                    deleteText();
+                    insertText(uyirMeiCombinations[lastMei][char]);
+                    lastMei = '';
+                } else {
+                    insertText(char);
+                }
+            } else {
+                insertText(char);
+            }
+        }
+
+        function insertText(char) {
+            let textArea = document.getElementById("textArea");
+            textArea.value += char;
+        }
+
+        function deleteText() {
+            let textArea = document.getElementById("textArea");
+            textArea.value = textArea.value.slice(0, -1);
+        }
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            generateKeyboard();
+        }
+
+        function toggleLang() {
+            isTamil = !isTamil;
+            lastMei = ''; // Reset last Mei Eluthu when switching languages
+            generateKeyboard();
+        }
+
+        generateKeyboard();
+    </script>
+</body>
+</html>
