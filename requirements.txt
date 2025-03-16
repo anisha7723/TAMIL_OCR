@@ -1,0 +1,8 @@
+Flask
+werkzeug
+google-cloud-vision
+google-generativeai
+hashlib
+json
+os
+io
