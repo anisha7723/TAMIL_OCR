@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Extracted Text</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        textarea { width: 80%; height: 150px; margin: 10px; padding: 10px; }
+        button { margin: 10px; padding: 10px 15px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2>Edit Extracted Text</h2>
+    <textarea id="editTextArea"></textarea>
+    <br>
+    <button onclick="refineTextWithAI()">Refine Using AI</button>
+    <button onclick="jumbleSentences()">Jumble Sentence Order</button>
+    <button onclick="openKeyboard()">Manual Correction</button>
+    <button onclick="wordSuggestionAI()">AI Word Suggestion</button>
+    <br>
+    <button onclick="saveEditedText()">Save Corrections</button>
+    <script>
+        let urlParams = new URLSearchParams(window.location.search);
+        let imageHash = urlParams.get('image_hash');
+
+        function refineTextWithAI() {
+            let text = document.getElementById('editTextArea').value;
+            fetch('/refine_text', {
+                method: 'POST',
+                body: JSON.stringify({ text }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById('editTextArea').value = data.refined_text);
+        }
+
+        function jumbleSentences() {
+            let text = document.getElementById('editTextArea').value;
+            let sentences = text.split('. ');
+            sentences = sentences.sort(() => Math.random() - 0.5);
+            document.getElementById('editTextArea').value = sentences.join('. ');
+        }
+
+        function openKeyboard() {
+            alert("Overlay keyboard feature coming soon!");
+        }
+
+        function wordSuggestionAI() {
+            let text = document.getElementById('editTextArea').value;
+            fetch('/word_suggestions', {
+                method: 'POST',
+                body: JSON.stringify({ text }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => alert("Suggested words: " + data.suggestions.join(', ')));
+        }
+
+        function saveEditedText() {
+            let correctedText = document.getElementById('editTextArea').value;
+            fetch('/save_correction', {
+                method: 'POST',
+                body: JSON.stringify({ image_hash: imageHash, corrected_text: correctedText }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
+        }
+    </script>
+</body>
+</html>

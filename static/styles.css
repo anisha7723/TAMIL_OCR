@@ -1,0 +1,242 @@
+/* Vibrant Pink-Violet Gradient Background */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff4ec7, #7b2ff7);
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Headers */
+h2, h3 {
+    font-weight: 600;
+    color: white;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* File Input */
+input[type="file"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid white;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+input[type="file"]:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Buttons - White with Blue Text */
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid #2e0af8;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    color: #2e0af8;
+    font-weight: bold;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2e0af8;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Extract Button */
+#extractTextBtn {
+    display: block;
+    margin: 20px auto;
+    padding: 14px 24px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#extractTextBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Text Areas */
+#outputText, #editTextArea {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid white;
+    width: 80%;
+    margin: 10px auto;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Word Buttons */
+.word-btn {
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 6px;
+    border: 2px solid #2e0af8;
+    background: white;
+    color: #2e0af8;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.word-btn:hover, .selected {
+    background: #2e0af8;
+    color: white;
+}
+
+/* Sentence Items (Draggable Words) */
+.sentence-item {
+    padding: 10px;
+    margin: 5px;
+    background: white;
+    color: #2e0af8;
+    cursor: grab;
+    border-radius: 5px;
+    border: 2px solid #2e0af8;
+}
+
+/* Preview Image */
+#preview {
+    max-width: 300px;
+    display: block;
+    margin: 10px auto;
+}
+
+/* Word List */
+#wordList {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+#keyboardOverlay {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: none;
+}
+.key { 
+    display: inline-block; 
+    width: 40px; height: 40px; 
+    margin: 5px; text-align: center; 
+    border: 1px solid #ccc; 
+    cursor: pointer; 
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+.key.space { width: 150px; }
+.key.large { width: 60px; }
+  /* Vibrant Pink-Violet Gradient Background */
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff4ec7, #7b2ff7);
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Headers */
+h2, h3 {
+    font-weight: 600;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* File Input */
+input[type="file"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid white;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+input[type="file"]:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Buttons */
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid #2e0af8;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    color: #2e0af8;
+    font-weight: bold;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2e0af8;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Text Areas */
+#outputText, #editTextArea {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid white;
+    width: 80%;
+    margin: 10px auto;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Keyboard Overlay */
+#keyboardOverlay {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: none;
+}
+
+/* Keyboard Keys */
+.key { 
+    display: inline-block; 
+    width: 40px; height: 40px; 
+    margin: 5px; text-align: center; 
+    border: 1px solid #ccc; 
+    cursor: pointer; 
+    background: #2e0202;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.key.space { width: 150px; }
+.key.large { width: 60px; }

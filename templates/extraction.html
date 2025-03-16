@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Text Extraction</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+
+    <h2>Upload an Image</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <button id="extractTextBtn" style="display:none;" onclick="extractText()">Extract Text</button>
+    
+    <div id="confirmTextSection" style="display:none;">
+        <h3>Extracted Text:</h3>
+        <p id="outputText"></p>
+        <button onclick="confirmText(true)">Yes, it's correct</button>
+        <button onclick="confirmText(false)">No, I want to edit</button>
+    </div>
+    <div id="editTextSection" style="display:none;">
+        <h2>Edit Extracted Text</h2>
+        <textarea id="editTextArea" style="width: 80%; height: 150px;"></textarea>
+        <br>
+        <button onclick="refineTextWithAI()">Refine Using AI</button>
+        <button id="reorderBtn" onclick="enableReordering()">Reorder Words</button>
+        <button onclick="openKeyboard()">Manual Correction</button>
+        <button onclick="wordSuggestionAI()">AI Word Suggestion</button>
+        <br>
+        <button onclick="saveEditedText()">Save Corrections</button>
+    </div>
+    <!-- Reordering Interface (Initially Hidden) -->
+<div id="reorderContainer" style="display: none;">
+    <h3>Reorder Words</h3>
+    <ul id="wordList"></ul>
+    
+    <button onclick="saveReorderedText()">Save</button>
+    <button onclick="cancelReordering()">Cancel</button>
+</div>
+    
+<div id="keyboardOverlay" style="display:none;">
+    <h3>Tamil-English Keyboard</h3>
+    <div id="keyboard"></div>
+    <button onclick="toggleLang()">🌐 Toggle Language</button>
+    <button onclick="toggleCase()">⬆️ Toggle Case</button>
+    <button onclick="closeKeyboard()">Close</button>
+</div>   
+    
+    <script>
+    let extractedText = ""; // Ensure extractedText is initialized
+    let imageHash = "";
+    let sortableInstance = null;
+
+    document.getElementById('extractTextBtn').style.display = "none";
+    document.getElementById('confirmTextSection').style.display = "none";
+    document.getElementById('editTextSection').style.display = "none";
+    document.getElementById('imageInput').addEventListener('change', function () {
+        document.getElementById('extractTextBtn').style.display = "block";
+    });
+
+    function extractText() {
+        let img = document.getElementById('imageInput').files[0];
+        if (!img) {
+            alert("Please select an image first.");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("image", img);
+
+        fetch('/extract_text', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                extractedText = data.text;
+                imageHash = data.image_hash;
+                document.getElementById('outputText').innerText = extractedText;
+                document.getElementById('confirmTextSection').style.display = "block";
+            });
+    }
+
+    function confirmText(isCorrect) {
+        if (isCorrect) {
+            alert("Text confirmed as correct.");
+        } else {
+            document.getElementById('confirmTextSection').style.display = "none";
+            document.getElementById('editTextSection').style.display = "block";
+            document.getElementById('editTextArea').value = extractedText;
+        }
+    }
+
+    function refineTextWithAI() {
+    let text = document.getElementById('editTextArea').value;
+
+    fetch('/refine_text', {
+        method: 'POST',
+        body: JSON.stringify({ text: text }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('editTextArea').value = data.refined_text;
+    })
+    .catch(error => console.error("Error refining text:", error));
+}
+
+let words = []; // Stores words for reordering
+let originalText = ""; // Stores original extracted text
+
+// Function to enable reordering mode
+function enableReordering() {
+    let extractedText = document.getElementById("outputText").innerText.trim();
+    if (!extractedText) {
+        alert("No text available to reorder.");
+        return;
+    }
+
+    originalText = extractedText;
+    words = extractedText.split(/\s+/);
+
+    let wordList = document.getElementById("wordList");
+    wordList.innerHTML = "";
+
+    words.forEach(word => {
+        let li = document.createElement("li");
+        li.innerText = word;
+        li.className = "word-btn";
+        wordList.appendChild(li);
+    });
+
+    // Make the list sortable
+    if (sortableInstance) sortableInstance.destroy(); // Avoid multiple instances
+    sortableInstance = new Sortable(wordList, { animation: 150 });
+
+    document.getElementById("reorderContainer").style.display = "block";
+}
+
+// Function to show the reorderable word list
+function showReorderInterface() {
+    let wordList = document.getElementById("wordList");
+    wordList.innerHTML = "";
+
+    words.forEach(word => {
+        let li = document.createElement("li");
+        li.innerText = word;
+        li.className = "word-btn";
+        wordList.appendChild(li);
+    });
+
+    // Make the list sortable
+    new Sortable(wordList, { animation: 150 });
+
+    // Show the reorder interface
+    document.getElementById("reorderContainer").style.display = "block";
+}
+
+// Function to save reordered text
+function saveReorderedText() {
+    let reorderedWords = [];
+    document.querySelectorAll("#wordList li").forEach(li => {
+        reorderedWords.push(li.innerText);
+    });
+
+    let reorderedText = reorderedWords.join(" ");
+    document.getElementById("textContainer").innerText = reorderedText; // Update main text
+
+    // Hide reorder interface
+    document.getElementById("reorderContainer").style.display = "none";
+}
+
+// Function to cancel reordering and revert to original text
+function cancelReordering() {
+    document.getElementById("textContainer").innerText = originalText;
+    document.getElementById("reorderContainer").style.display = "none";
+}
+
+    function openKeyboard() {
+        alert("Overlay keyboard feature coming soon!");
+    }
+
+    function wordSuggestionAI() {
+        let text = document.getElementById('editTextArea').value;
+        fetch('/word_suggestions', {
+            method: 'POST',
+            body: JSON.stringify({ text }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => alert("Suggested words: " + data.suggestions.join(', ')));
+    }
+
+    function saveEditedText() {
+        let correctedText = document.getElementById('editTextArea').value;
+        fetch('/save_correction', {
+            method: 'POST',
+            body: JSON.stringify({ image_hash: imageHash, corrected_text: correctedText }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => alert(data.message));
+    }
+    let isUpperCase = false;
+        let isTamil = false;
+        let lastMei = '';
+        
+        const englishLettersLower = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        const englishLettersUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const tamilUyirEluthu = ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ'];
+        const tamilMeiEluthu = ['க', 'ங', 'ச', 'ஞ', 'ட', 'ண', 'த', 'ந', 'ப', 'ம', 'ய', 'ர', 'ல', 'வ', 'ழ', 'ள', 'ற', 'ன'];
+        const uyirMeiCombinations = {
+            'அ': '', 'ஆ': 'ா', 'இ': 'ி', 'ஈ': 'ீ', 'உ': 'ு', 'ஊ': 'ூ', 'எ': 'ெ', 'ஏ': 'ே', 'ஐ': 'ை', 'ஒ': 'ொ', 'ஓ': 'ோ', 'ஔ': 'ௌ'
+        };
+        
+        function generateKeyboard() {
+            const keyboardDiv = document.getElementById("keyboard");
+            keyboardDiv.innerHTML = '';
+            let letters = isTamil ? [...tamilUyirEluthu, ...tamilMeiEluthu] : (isUpperCase ? englishLettersUpper : englishLettersLower);
+            
+            letters.forEach(letter => {
+                let key = document.createElement("div");
+                key.className = "key";
+                key.textContent = letter;
+                key.onclick = () => handleKeyPress(letter);
+                keyboardDiv.appendChild(key);
+            });
+        }
+        
+        function handleKeyPress(letter) {
+            if (isTamil) {
+                if (tamilMeiEluthu.includes(letter)) {
+                    lastMei = letter;
+                    insertText(letter);
+                } else if (lastMei && uyirMeiCombinations[letter] !== undefined) {
+                    deleteLastCharacter();
+                    insertText(lastMei + uyirMeiCombinations[letter]);
+                    lastMei = '';
+                } else {
+                    insertText(letter);
+                }
+            } else {
+                insertText(letter);
+            }
+        }
+        
+        function insertText(letter) {
+            alert("Key pressed: " + letter);
+        }
+        
+        function deleteLastCharacter() {
+            alert("Deleting last character");
+        }
+        
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            generateKeyboard();
+        }
+        
+        function toggleLang() {
+            isTamil = !isTamil;
+            lastMei = '';
+            generateKeyboard();
+        }
+        
+        function openKeyboard() {
+            document.getElementById("keyboardOverlay").style.display = "block";
+            generateKeyboard();
+        }
+        
+        function closeKeyboard() {
+            document.getElementById("keyboardOverlay").style.display = "none";
+        }
+    </script>
+    
+  
+    
+</body>
+</html>
